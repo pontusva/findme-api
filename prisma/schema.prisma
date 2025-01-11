@@ -1,0 +1,149 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Add your models here
+model User {
+  id            String          @id @default(uuid())
+  name          String
+  email         String          @unique
+  phoneNumber   String? // Optional phone number
+  address       String?
+  pets          Pet[]
+  reports       LostPetReport[]
+  foundPets     FoundPet[]
+  statusUpdates ReportStatus[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @default(now())
+  sentNotifications     Notification[] @relation("SentNotifications")
+  receivedNotifications Notification[] @relation("ReceivedNotifications")
+  pushSubscriptions PushSubscription[]
+}
+
+model Pet {
+  id            String          @id @default(uuid())
+  name          String
+  type          String // Dog, Cat, Bird, etc.
+  breed         String?
+  age           Int?
+  gender        String? // Male, Female
+  description   String?
+  microchipId   String? // Optional unique microchip ID
+  photoUrl      String? // URL to the pet's photo
+  ownerId       String
+  microchip     Microchip?
+  owner         User            @relation(fields: [ownerId], references: [id])
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  LostPetReport LostPetReport[]
+}
+
+model LostPetReport {
+  id           String         @id @default(uuid())
+  petId        String
+  pet          Pet            @relation(fields: [petId], references: [id])
+  locationId   String?        @unique
+  location     Location?      @relation(fields: [locationId], references: [id])
+  description  String?
+  status       String         @default("Open")
+  reportedBy   String
+  statuses     ReportStatus[]
+  reporter     User           @relation(fields: [reportedBy], references: [id])
+  photoMatches PhotoMatch[]
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+}
+
+model FoundPet {
+  id           String       @id @default(uuid())
+  finderId     String
+  finder       User         @relation(fields: [finderId], references: [id])
+  locationId   String? // Link to Location model
+  location     Location?
+  photoUrl     String? // URL to the photo of the found pet
+  description  String? // Additional details
+  status       String       @default("Open") // Open, Reunited
+  photoMatches PhotoMatch[]
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  senderId  String?
+  recipient User     @relation("ReceivedNotifications", fields: [userId], references: [id])
+  sender    User?    @relation("SentNotifications", fields: [senderId], references: [id])
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Location {
+  id           String         @id @default(uuid())
+  latitude     Float // GPS latitude
+  longitude    Float // GPS longitude
+  address      String? // Optional human-readable address
+  foundPetId   String?        @unique
+  foundPet     FoundPet?      @relation(fields: [foundPetId], references: [id])
+  lostReportId String?        @unique
+  lostReport   LostPetReport?
+  createdAt    DateTime       @default(now())
+}
+
+model Microchip {
+  id           String   @id @default(uuid()) // Unique ID for the chip
+  chipNumber   String   @unique // Microchip identifier
+  petId        String   @unique // Linked to a registered pet
+  pet          Pet      @relation(fields: [petId], references: [id])
+  registeredAt DateTime @default(now())
+}
+
+model ReportStatus {
+  id              String         @id @default(uuid())
+  reportId        String
+  reportType      String // "LostPetReport" or "FoundPet"
+  status          String         @default("Open") // e.g., Open, Reunited, Resolved
+  updatedBy       String
+  updater         User           @relation(fields: [updatedBy], references: [id])
+  updatedAt       DateTime       @default(now())
+  note            String? // Optional comment about the status update
+  LostPetReport   LostPetReport? @relation(fields: [lostPetReportId], references: [id])
+  lostPetReportId String?
+}
+
+model PhotoMatch {
+  id           String        @id @default(uuid())
+  lostReportId String
+  lostReport   LostPetReport @relation(fields: [lostReportId], references: [id])
+  foundPetId   String
+  foundPet     FoundPet      @relation(fields: [foundPetId], references: [id])
+  similarity   Float // Confidence level (e.g., 0.95 for 95%)
+  matchedAt    DateTime      @default(now())
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relation to User
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+}
