@@ -88,6 +88,10 @@ export interface NexusGenObjects {
     senderId?: string | null; // String
     userId: string; // String!
   }
+  NotificationsPayload: { // root type
+    latestNotifications: NexusGenRootTypes['Notification'][]; // [Notification!]!
+    newNotification: NexusGenRootTypes['Notification']; // Notification!
+  }
   Pet: { // root type
     age?: number | null; // Int
     breed?: string | null; // String
@@ -127,6 +131,7 @@ export interface NexusGenObjects {
     status: string; // String!
     updatedBy: string; // String!
   }
+  Subscription: {};
   User: { // root type
     address?: string | null; // String
     email: string; // String!
@@ -213,6 +218,10 @@ export interface NexusGenFieldTypes {
     senderId: string | null; // String
     userId: string; // String!
   }
+  NotificationsPayload: { // field return type
+    latestNotifications: NexusGenRootTypes['Notification'][]; // [Notification!]!
+    newNotification: NexusGenRootTypes['Notification']; // Notification!
+  }
   Pet: { // field return type
     age: number | null; // Int
     breed: string | null; // String
@@ -270,6 +279,9 @@ export interface NexusGenFieldTypes {
     status: string; // String!
     updatedBy: string; // String!
     updater: NexusGenRootTypes['User']; // User!
+  }
+  Subscription: { // field return type
+    notifications: NexusGenRootTypes['NotificationsPayload'] | null; // NotificationsPayload
   }
   User: { // field return type
     address: string | null; // String
@@ -352,6 +364,10 @@ export interface NexusGenFieldTypeNames {
     senderId: 'String'
     userId: 'String'
   }
+  NotificationsPayload: { // field return type name
+    latestNotifications: 'Notification'
+    newNotification: 'Notification'
+  }
   Pet: { // field return type name
     age: 'Int'
     breed: 'String'
@@ -409,6 +425,9 @@ export interface NexusGenFieldTypeNames {
     status: 'String'
     updatedBy: 'String'
     updater: 'User'
+  }
+  Subscription: { // field return type name
+    notifications: 'NotificationsPayload'
   }
   User: { // field return type name
     address: 'String'
@@ -489,6 +508,11 @@ export interface NexusGenArgTypes {
     getUserPets: { // args
       userId: string; // String!
     }
+    notifications: { // args
+      userId: string; // String!
+    }
+  }
+  Subscription: {
     notifications: { // args
       userId: string; // String!
     }

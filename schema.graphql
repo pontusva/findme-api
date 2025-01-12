@@ -76,6 +76,11 @@ type Notification {
   userId: String!
 }
 
+type NotificationsPayload {
+  latestNotifications: [Notification!]!
+  newNotification: Notification!
+}
+
 type Pet {
   age: Int
   breed: String
@@ -138,6 +143,10 @@ type ReportStatus {
   status: String!
   updatedBy: String!
   updater: User!
+}
+
+type Subscription {
+  notifications(userId: String!): NotificationsPayload
 }
 
 """The `Upload` scalar type represents a file upload."""
