@@ -190,6 +190,92 @@ export default async function pushNotificationRoutes(fastify: FastifyInstance) {
     }
   });
 
+  // Send chat message notifications
+  fastify.post("/push/sendMessageNotification", async (request, reply) => {
+    const { senderId, receiverId, message, chatId } = request.body as {
+      senderId: string;
+      receiverId: string;
+      message: string;
+      chatId: string;
+    };
+
+    try {
+      // Step 1: Get the subscription details of the recipient (receiver)
+      const subscriptions = await prisma.pushSubscription.findMany({
+        where: { userId: receiverId },
+      });
+
+      if (!subscriptions.length) {
+        return reply.status(404).send({
+          status: "error",
+          message: "No subscriptions found for the recipient",
+        });
+      }
+
+      // Step 2: Construct the payload for the notification
+      const payload = JSON.stringify({
+        title: "New Message",
+        body: `${message} - from ${senderId}`,
+        chatId,
+      });
+
+      const errors: Error[] = [];
+
+      // Step 3: Send notifications to each subscription endpoint
+      await Promise.all(
+        subscriptions.map(async (subscription) => {
+          try {
+            await webpush.sendNotification(
+              {
+                endpoint: subscription.endpoint,
+                keys: {
+                  p256dh: subscription.p256dh,
+                  auth: subscription.auth,
+                },
+              },
+              payload
+            );
+          } catch (error) {
+            errors.push(error as Error);
+            console.error(
+              "Error sending notification to endpoint:",
+              subscription.endpoint,
+              error
+            );
+
+            // Step 4: Remove the subscription if it's invalid (e.g., endpoint is no longer valid)
+            if (
+              error instanceof Error &&
+              (error.name === "WebPushError" || error.message.includes("410"))
+            ) {
+              console.warn(
+                `Removing subscription for endpoint: ${subscription.endpoint} due to error: ${error.message}`
+              );
+              await prisma.pushSubscription.delete({
+                where: { endpoint: subscription.endpoint },
+              });
+            }
+          }
+        })
+      );
+
+      return {
+        status: "success",
+        message: "Message notifications sent successfully",
+        errors: errors.length ? errors.map((e) => e.message) : undefined,
+      };
+    } catch (error) {
+      console.error("Error sending message notifications:", error);
+      return reply.status(500).send({
+        status: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to send notifications",
+      });
+    }
+  });
+
   // Get stats
   //   fastify.get('/push/stats', async () => {
   //     const stats = await prisma.$transaction([
