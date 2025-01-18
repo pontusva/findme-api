@@ -5,6 +5,8 @@ import { petMutations, petQueries } from "./pet";
 import { locationMutations } from "./location";
 import { createNotificationMutation } from "./Notifications";
 import { notificationQueries } from "./Notifications";
+import { chatPartnerMutations, chatPartnerQueries } from "./ChatPartner";
+import { chatMessagesQueries } from "./ChatMessages";
 
 export const Mutation = objectType({
   name: "Mutation",
@@ -28,6 +30,10 @@ export const Mutation = objectType({
     Object.entries(createNotificationMutation).forEach(([_, mutation]) => {
       mutation(t);
     });
+
+    Object.entries(chatPartnerMutations).forEach(([_, mutation]) => {
+      mutation(t);
+    });
   },
 });
 
@@ -47,6 +53,14 @@ export const Query = objectType({
     });
 
     Object.entries(notificationQueries).forEach(([_, query]) => {
+      query(t);
+    });
+
+    Object.entries(chatPartnerQueries).forEach(([_, query]) => {
+      query(t);
+    });
+
+    Object.entries(chatMessagesQueries).forEach(([_, query]) => {
       query(t);
     });
   },

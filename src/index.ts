@@ -83,8 +83,9 @@ const yoga = createYoga<{
     const body = request.body as GraphQLRequestBody;
     const operationName = body?.operationName;
 
-    // Only allow initial page load and introspection without auth
+    // Only allow initial page  load and introspection without auth
     if (!body?.query || operationName === "IntrospectionQuery") {
+      console.log("IntrospectionQuery");
       return {
         prisma,
         userId: null,
@@ -100,19 +101,21 @@ const yoga = createYoga<{
     }
 
     // For all other operations, require authentication
-    const token = request.headers.get("authorization")?.replace("Bearer ", "");
+    const token = request.headers.get("authorization");
 
     if (!token) {
       throw new Error("Authentication required");
     }
 
     try {
-      const session = await clerkClient.sessions.verifySession(token, token);
+      const session = await clerkClient.sessions.getSession(token);
+
       return {
         prisma,
         userId: session.userId,
       };
     } catch (error) {
+      console.error("Authentication error:", error);
       throw new Error("Invalid token");
     }
   },

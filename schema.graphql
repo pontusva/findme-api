@@ -7,6 +7,13 @@ type AuthResponse {
   userId: String!
 }
 
+type ChatPartner {
+  partner: User!
+  partnerId: String!
+  user: User!
+  userId: String!
+}
+
 type FoundPet {
   description: String
   finder: User!
@@ -48,6 +55,13 @@ type LostPetReport {
   statuses: [ReportStatus!]!
 }
 
+type Message {
+  content: String!
+  id: String!
+  receiverId: String!
+  senderId: String!
+}
+
 type Microchip {
   chipNumber: String!
   id: String!
@@ -56,13 +70,16 @@ type Microchip {
 }
 
 type Mutation {
+  createChatPartner(partnerId: String!, userId: String!): ChatPartner!
   createLocation(address: String, foundPetId: String, latitude: Float!, longitude: Float!, lostReportId: String): Location!
   createLostPetReport(description: String, locationId: String, petId: String!, reportedBy: String!, status: String): LostPetReport!
-  createNotification(email: String!, message: String!, name: String!, phone: String!, userId: String!): Notification!
+  createNotification(email: String!, message: String!, name: String!, phone: String!, senderId: String!, userId: String!): Notification!
   createPet(age: Int, breed: String, description: String, gender: String, microchipId: String, name: String!, ownerId: String!, photoUrl: String, type: String!): Pet
   createUser(email: String!, name: String): User!
+  deleteChatPartner(partnerId: String!, userId: String!): ChatPartner!
   login(email: String!, password: String!): AuthResponse!
   logout: Logout!
+  sendMessage(content: String!, receiverId: String!, senderId: String!): Message
   updateLostPetReport(description: String, id: String!, locationId: String, status: String): LostPetReport!
 }
 
@@ -125,6 +142,8 @@ type Query {
   getAllLostPetReports: [LostPetReport!]!
   getAllLostPets: [LostPetReport!]!
   getAllUsers: [User!]!
+  getChatMessages(chatId: String!): [Message!]!
+  getChatPartners(userId: String!): [ChatPartner!]!
   getFilteredPets(searchTerm: String): [LostPetReport]!
   getLostPetReport(id: String!): LostPetReport!
   getPet(id: String!): Pet!
@@ -146,6 +165,7 @@ type ReportStatus {
 }
 
 type Subscription {
+  message(chatId: String!): Message
   notifications(userId: String!): NotificationsPayload
 }
 

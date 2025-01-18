@@ -7,14 +7,19 @@ import {
   stringArg,
 } from "nexus";
 import { PetOwner } from "./types/PetOwner";
+import { ChatPartner } from "./types/ChatPartner";
 import { Mutation, Query } from "./resolvers/index";
+import {
+  MessageSubscription,
+  SendMessage,
+} from "./resolvers/MessageSubsription";
 import prisma from "./lib/prisma";
 import { GraphQLUpload } from "graphql-upload-minimal";
 import pubsub from "./lib/pubsub";
 
 export const Upload = asNexusMethod(GraphQLUpload, "Upload");
 
-const User = objectType({
+export const User = objectType({
   name: "User",
   definition(t) {
     t.nonNull.string("id");
@@ -370,8 +375,6 @@ const NotificationsSubscription = subscriptionField("notifications", {
     userId: nonNull(stringArg()),
   },
   subscribe: (_, { userId }) => {
-    // Subscribe to the specific user notification channel
-    console.log(userId);
     return pubsub.subscribe(`notifications-${userId}`);
   },
   resolve: async (payload) => {
@@ -380,7 +383,7 @@ const NotificationsSubscription = subscriptionField("notifications", {
       where: { userId: payload.notificationsSubscription.userId }, // Ensure to filter by userId
       orderBy: { createdAt: "desc" }, // Order by creation date, most recent first
     });
-    console.log(latestNotifications);
+
     // Return both the new notification and the latest notifications
     return {
       newNotification: payload.notificationsSubscription,
@@ -408,6 +411,9 @@ export const schema = makeSchema({
     Logout,
     NotificationsSubscription,
     NotificationsPayload,
+    MessageSubscription,
+    SendMessage,
+    ChatPartner,
   ],
   outputs: {
     schema: __dirname + "/../schema.graphql",

@@ -13,8 +13,13 @@ export const createNotificationMutation = {
         email: nonNull(stringArg()),
         phone: nonNull(stringArg()),
         message: nonNull(stringArg()),
+        senderId: nonNull(stringArg()),
       },
-      resolve: async (_, { userId, name, email, phone, message }) => {
+      resolve: async (
+        _,
+        { userId, name, email, phone, message, senderId },
+        context
+      ) => {
         try {
           // Validate inputs
           if (!email.includes("@")) {
@@ -25,7 +30,7 @@ export const createNotificationMutation = {
           const notification = await prisma.notification.create({
             data: {
               userId,
-              senderId: userId,
+              senderId,
               createdAt: new Date(),
               message: `Contact from ${name} (${email}, ${phone}): ${message}`,
               read: false,

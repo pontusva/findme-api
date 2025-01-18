@@ -48,6 +48,12 @@ export interface NexusGenObjects {
     token: string; // String!
     userId: string; // String!
   }
+  ChatPartner: { // root type
+    partner: NexusGenRootTypes['User']; // User!
+    partnerId: string; // String!
+    user: NexusGenRootTypes['User']; // User!
+    userId: string; // String!
+  }
   FoundPet: { // root type
     description?: string | null; // String
     finderId: string; // String!
@@ -74,6 +80,12 @@ export interface NexusGenObjects {
     petId: string; // String!
     reportedBy: string; // String!
     status: string; // String!
+  }
+  Message: { // root type
+    content: string; // String!
+    id: string; // String!
+    receiverId: string; // String!
+    senderId: string; // String!
   }
   Microchip: { // root type
     chipNumber: string; // String!
@@ -156,6 +168,12 @@ export interface NexusGenFieldTypes {
     token: string; // String!
     userId: string; // String!
   }
+  ChatPartner: { // field return type
+    partner: NexusGenRootTypes['User']; // User!
+    partnerId: string; // String!
+    user: NexusGenRootTypes['User']; // User!
+    userId: string; // String!
+  }
   FoundPet: { // field return type
     description: string | null; // String
     finder: NexusGenRootTypes['User']; // User!
@@ -193,6 +211,12 @@ export interface NexusGenFieldTypes {
     status: string; // String!
     statuses: NexusGenRootTypes['ReportStatus'][]; // [ReportStatus!]!
   }
+  Message: { // field return type
+    content: string; // String!
+    id: string; // String!
+    receiverId: string; // String!
+    senderId: string; // String!
+  }
   Microchip: { // field return type
     chipNumber: string; // String!
     id: string; // String!
@@ -200,13 +224,16 @@ export interface NexusGenFieldTypes {
     petId: string; // String!
   }
   Mutation: { // field return type
+    createChatPartner: NexusGenRootTypes['ChatPartner']; // ChatPartner!
     createLocation: NexusGenRootTypes['Location']; // Location!
     createLostPetReport: NexusGenRootTypes['LostPetReport']; // LostPetReport!
     createNotification: NexusGenRootTypes['Notification']; // Notification!
     createPet: NexusGenRootTypes['Pet'] | null; // Pet
     createUser: NexusGenRootTypes['User']; // User!
+    deleteChatPartner: NexusGenRootTypes['ChatPartner']; // ChatPartner!
     login: NexusGenRootTypes['AuthResponse']; // AuthResponse!
     logout: NexusGenRootTypes['Logout']; // Logout!
+    sendMessage: NexusGenRootTypes['Message'] | null; // Message
     updateLostPetReport: NexusGenRootTypes['LostPetReport']; // LostPetReport!
   }
   Notification: { // field return type
@@ -262,6 +289,8 @@ export interface NexusGenFieldTypes {
     getAllLostPetReports: NexusGenRootTypes['LostPetReport'][]; // [LostPetReport!]!
     getAllLostPets: NexusGenRootTypes['LostPetReport'][]; // [LostPetReport!]!
     getAllUsers: NexusGenRootTypes['User'][]; // [User!]!
+    getChatMessages: NexusGenRootTypes['Message'][]; // [Message!]!
+    getChatPartners: NexusGenRootTypes['ChatPartner'][]; // [ChatPartner!]!
     getFilteredPets: Array<NexusGenRootTypes['LostPetReport'] | null>; // [LostPetReport]!
     getLostPetReport: NexusGenRootTypes['LostPetReport']; // LostPetReport!
     getPet: NexusGenRootTypes['Pet']; // Pet!
@@ -281,6 +310,7 @@ export interface NexusGenFieldTypes {
     updater: NexusGenRootTypes['User']; // User!
   }
   Subscription: { // field return type
+    message: NexusGenRootTypes['Message'] | null; // Message
     notifications: NexusGenRootTypes['NotificationsPayload'] | null; // NotificationsPayload
   }
   User: { // field return type
@@ -300,6 +330,12 @@ export interface NexusGenFieldTypes {
 export interface NexusGenFieldTypeNames {
   AuthResponse: { // field return type name
     token: 'String'
+    userId: 'String'
+  }
+  ChatPartner: { // field return type name
+    partner: 'User'
+    partnerId: 'String'
+    user: 'User'
     userId: 'String'
   }
   FoundPet: { // field return type name
@@ -339,6 +375,12 @@ export interface NexusGenFieldTypeNames {
     status: 'String'
     statuses: 'ReportStatus'
   }
+  Message: { // field return type name
+    content: 'String'
+    id: 'String'
+    receiverId: 'String'
+    senderId: 'String'
+  }
   Microchip: { // field return type name
     chipNumber: 'String'
     id: 'String'
@@ -346,13 +388,16 @@ export interface NexusGenFieldTypeNames {
     petId: 'String'
   }
   Mutation: { // field return type name
+    createChatPartner: 'ChatPartner'
     createLocation: 'Location'
     createLostPetReport: 'LostPetReport'
     createNotification: 'Notification'
     createPet: 'Pet'
     createUser: 'User'
+    deleteChatPartner: 'ChatPartner'
     login: 'AuthResponse'
     logout: 'Logout'
+    sendMessage: 'Message'
     updateLostPetReport: 'LostPetReport'
   }
   Notification: { // field return type name
@@ -408,6 +453,8 @@ export interface NexusGenFieldTypeNames {
     getAllLostPetReports: 'LostPetReport'
     getAllLostPets: 'LostPetReport'
     getAllUsers: 'User'
+    getChatMessages: 'Message'
+    getChatPartners: 'ChatPartner'
     getFilteredPets: 'LostPetReport'
     getLostPetReport: 'LostPetReport'
     getPet: 'Pet'
@@ -427,6 +474,7 @@ export interface NexusGenFieldTypeNames {
     updater: 'User'
   }
   Subscription: { // field return type name
+    message: 'Message'
     notifications: 'NotificationsPayload'
   }
   User: { // field return type name
@@ -445,6 +493,10 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Mutation: {
+    createChatPartner: { // args
+      partnerId: string; // String!
+      userId: string; // String!
+    }
     createLocation: { // args
       address?: string | null; // String
       foundPetId?: string | null; // String
@@ -464,6 +516,7 @@ export interface NexusGenArgTypes {
       message: string; // String!
       name: string; // String!
       phone: string; // String!
+      senderId: string; // String!
       userId: string; // String!
     }
     createPet: { // args
@@ -481,9 +534,18 @@ export interface NexusGenArgTypes {
       email: string; // String!
       name?: string | null; // String
     }
+    deleteChatPartner: { // args
+      partnerId: string; // String!
+      userId: string; // String!
+    }
     login: { // args
       email: string; // String!
       password: string; // String!
+    }
+    sendMessage: { // args
+      content: string; // String!
+      receiverId: string; // String!
+      senderId: string; // String!
     }
     updateLostPetReport: { // args
       description?: string | null; // String
@@ -493,6 +555,12 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
+    getChatMessages: { // args
+      chatId: string; // String!
+    }
+    getChatPartners: { // args
+      userId: string; // String!
+    }
     getFilteredPets: { // args
       searchTerm?: string | null; // String
     }
@@ -513,6 +581,9 @@ export interface NexusGenArgTypes {
     }
   }
   Subscription: {
+    message: { // args
+      chatId: string; // String!
+    }
     notifications: { // args
       userId: string; // String!
     }
