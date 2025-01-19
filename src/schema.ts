@@ -234,6 +234,7 @@ const Notification = objectType({
     t.nonNull.string("id");
     t.nonNull.string("message");
     t.nonNull.string("userId");
+    t.nonNull.boolean("showEmail");
     t.string("senderId");
     t.nonNull.boolean("read");
     t.field("recipient", {

@@ -73,7 +73,7 @@ type Mutation {
   createChatPartner(partnerId: String!, userId: String!): ChatPartner!
   createLocation(address: String, foundPetId: String, latitude: Float!, longitude: Float!, lostReportId: String): Location!
   createLostPetReport(description: String, locationId: String, petId: String!, reportedBy: String!, status: String): LostPetReport!
-  createNotification(email: String!, message: String!, name: String!, phone: String!, senderId: String!, userId: String!): Notification!
+  createNotification(message: String!, senderId: String!, showEmail: Boolean!, userId: String!): Notification!
   createPet(age: Int, breed: String, description: String, gender: String, microchipId: String, name: String!, ownerId: String!, photoUrl: String, type: String!): Pet
   createUser(email: String!, name: String): User!
   deleteChatPartner(partnerId: String!, userId: String!): ChatPartner!
@@ -90,6 +90,7 @@ type Notification {
   recipient: User
   sender: User
   senderId: String
+  showEmail: Boolean!
   userId: String!
 }
 

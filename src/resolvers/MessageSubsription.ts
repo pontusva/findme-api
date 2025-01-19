@@ -3,6 +3,10 @@ import pubsub from "../lib/pubsub";
 import prisma from "../lib/prisma";
 import { objectType } from "nexus";
 import { Message } from "@prisma/client";
+import { encrypt, decrypt } from "../encryption";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const Message = objectType({
   name: "Message",
@@ -45,6 +49,7 @@ export const SendMessage = mutationField("sendMessage", {
     // Pre-compute chatId from senderId and receiverId
     const chatId = getChatId(senderId, receiverId);
     console.log({ chatId }, "chatId");
+
     // Check if the chat already exists
     const existingChat = await prisma.chat.findFirst({
       where: {
@@ -77,17 +82,24 @@ export const SendMessage = mutationField("sendMessage", {
       createdChatId = existingChat.id;
     }
 
-    // Create the message with the determined chatId
+    // Encrypt the message content before storing it in the database
+    const secretKey = process.env.ENCRYPTION_KEY;
+
+    const encryptedContent = encrypt(content, secretKey!);
+
+    // Create the encrypted message with the determined chatId
     const message = await prisma.message.create({
       data: {
-        content,
+        content: encryptedContent, // Store encrypted content
         senderId,
         chatId: createdChatId, // Use the created chatId
       },
     });
 
+    const decryptedContent = decrypt(encryptedContent, secretKey!);
+
     // Publish the message to the chatId topic
-    pubsub.publish(`message-${createdChatId}`, message);
+    pubsub.publish(`message-${createdChatId}`, decryptedContent);
 
     return message; // Return the created message
   },

@@ -1,5 +1,5 @@
-import { nonNull, stringArg, subscriptionField } from "nexus";
-import { ObjectDefinitionBlock } from "nexus/dist/core";
+import { nonNull, stringArg } from "nexus";
+import { booleanArg, ObjectDefinitionBlock } from "nexus/dist/core";
 import prisma from "../lib/prisma";
 import pubsub from "../lib/pubsub";
 
@@ -9,31 +9,20 @@ export const createNotificationMutation = {
       type: "Notification",
       args: {
         userId: nonNull(stringArg()),
-        name: nonNull(stringArg()),
-        email: nonNull(stringArg()),
-        phone: nonNull(stringArg()),
         message: nonNull(stringArg()),
         senderId: nonNull(stringArg()),
+        showEmail: nonNull(booleanArg()),
       },
-      resolve: async (
-        _,
-        { userId, name, email, phone, message, senderId },
-        context
-      ) => {
+      resolve: async (_, { userId, message, senderId, showEmail }, context) => {
         try {
-          // Validate inputs
-          if (!email.includes("@")) {
-            throw new Error("Invalid email format");
-          }
-
-          // Create notification in the database
           const notification = await prisma.notification.create({
             data: {
               userId,
               senderId,
               createdAt: new Date(),
-              message: `Contact from ${name} (${email}, ${phone}): ${message}`,
+              message: message,
               read: false,
+              showEmail,
             },
           });
 

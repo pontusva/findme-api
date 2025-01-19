@@ -98,6 +98,7 @@ export interface NexusGenObjects {
     message: string; // String!
     read: boolean; // Boolean!
     senderId?: string | null; // String
+    showEmail: boolean; // Boolean!
     userId: string; // String!
   }
   NotificationsPayload: { // root type
@@ -243,6 +244,7 @@ export interface NexusGenFieldTypes {
     recipient: NexusGenRootTypes['User'] | null; // User
     sender: NexusGenRootTypes['User'] | null; // User
     senderId: string | null; // String
+    showEmail: boolean; // Boolean!
     userId: string; // String!
   }
   NotificationsPayload: { // field return type
@@ -407,6 +409,7 @@ export interface NexusGenFieldTypeNames {
     recipient: 'User'
     sender: 'User'
     senderId: 'String'
+    showEmail: 'Boolean'
     userId: 'String'
   }
   NotificationsPayload: { // field return type name
@@ -512,11 +515,9 @@ export interface NexusGenArgTypes {
       status?: string | null; // String
     }
     createNotification: { // args
-      email: string; // String!
       message: string; // String!
-      name: string; // String!
-      phone: string; // String!
       senderId: string; // String!
+      showEmail: boolean; // Boolean!
       userId: string; // String!
     }
     createPet: { // args
