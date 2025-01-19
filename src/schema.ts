@@ -16,9 +16,10 @@ import {
 import prisma from "./lib/prisma";
 import { GraphQLUpload } from "graphql-upload-minimal";
 import pubsub from "./lib/pubsub";
+import { decrypt } from "./encryption";
 
 export const Upload = asNexusMethod(GraphQLUpload, "Upload");
-
+const secretKey = process.env.ENCRYPTION_KEY;
 export const User = objectType({
   name: "User",
   definition(t) {
@@ -94,6 +95,10 @@ const Pet = objectType({
         const owner = await prisma.pet
           .findUnique({ where: { id: parent.id } })
           .owner();
+
+        if (owner) {
+          owner.email = decrypt(owner.email, secretKey!);
+        }
         return owner ?? null;
       },
     });
@@ -247,11 +252,15 @@ const Notification = objectType({
     });
     t.field("sender", {
       type: "User",
-      resolve: (parent) => {
+      resolve: async (parent) => {
         if (!parent.senderId) return null;
-        return prisma.notification
+        const sender = await prisma.notification
           .findUnique({ where: { id: parent.id } })
           .sender();
+        if (sender) {
+          sender.email = decrypt(sender.email, secretKey!);
+        }
+        return sender;
       },
     });
   },
